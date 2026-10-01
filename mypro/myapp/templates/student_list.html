@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <table border="1">
+      <tr>
+        <th>Actions</th>
+      </tr>
+      {% for s in students %}
+      <tr>
+        <td>{{s.name}}</td>
+        <td>{{s.rollno}}</td>
+        <td>{{s.student_class}}</td>
+        <td>{{s.age}}</td>
+        <td>{{s.parentno}}</td>
+        <td>
+          <a href="/modelsapp/update/{{s.id}}">Edit</a>
+          <a href="/modelsapp/delete/{{s.id}}">Delete</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+    <br />
+    <a href="/modelsapp/">Add New Student</a>
+  </body>
+</html>

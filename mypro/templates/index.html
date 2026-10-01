@@ -1,0 +1,1166 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Glass Calculator</title>
+
+    <style>
+        /* ==============================
+           GLOBAL RESET
+        ============================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+
+            background:
+                radial-gradient(circle at 10% 20%, rgba(0, 255, 255, 0.25), transparent 30%),
+                radial-gradient(circle at 90% 80%, rgba(255, 0, 255, 0.25), transparent 30%),
+                linear-gradient(
+                    135deg,
+                    #050816,
+                    #0b1026,
+                    #111a3a,
+                    #160d2d
+                );
+
+            background-size: 200% 200%;
+            animation: backgroundMove 12s ease infinite;
+
+            color: white;
+        }
+
+        @keyframes backgroundMove {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+
+        /* ==============================
+           BACKGROUND BLOBS
+        ============================== */
+
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.45;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .blob-one {
+            width: 300px;
+            height: 300px;
+            background: #00f5ff;
+            top: -80px;
+            left: -80px;
+            animation: blobOne 9s infinite alternate ease-in-out;
+        }
+
+        .blob-two {
+            width: 350px;
+            height: 350px;
+            background: #ff00cc;
+            bottom: -120px;
+            right: -100px;
+            animation: blobTwo 11s infinite alternate ease-in-out;
+        }
+
+        .blob-three {
+            width: 220px;
+            height: 220px;
+            background: #6c00ff;
+            top: 45%;
+            left: 55%;
+            animation: blobThree 8s infinite alternate ease-in-out;
+        }
+
+        @keyframes blobOne {
+            from {
+                transform: translate(0, 0) scale(1);
+            }
+
+            to {
+                transform: translate(180px, 120px) scale(1.3);
+            }
+        }
+
+        @keyframes blobTwo {
+            from {
+                transform: translate(0, 0) scale(1);
+            }
+
+            to {
+                transform: translate(-150px, -120px) scale(1.25);
+            }
+        }
+
+        @keyframes blobThree {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(-100px, 80px);
+            }
+        }
+
+
+        /* ==============================
+           MOUSE GLOW
+        ============================== */
+
+        .mouse-glow {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+
+            border-radius: 50%;
+
+            background: radial-gradient(
+                circle,
+                rgba(0, 255, 255, 0.18),
+                transparent 65%
+            );
+
+            pointer-events: none;
+
+            transform: translate(-50%, -50%);
+
+            z-index: 0;
+
+            transition:
+                left 0.15s ease,
+                top 0.15s ease;
+        }
+
+
+        /* ==============================
+           MAIN CARD
+        ============================== */
+
+        .calculator {
+            position: relative;
+
+            width: min(430px, 92vw);
+
+            padding: 35px;
+
+            border-radius: 28px;
+
+            background: rgba(255, 255, 255, 0.08);
+
+            border: 1px solid rgba(255, 255, 255, 0.2);
+
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+
+            box-shadow:
+                0 30px 80px rgba(0, 0, 0, 0.5),
+                inset 0 0 30px rgba(255, 255, 255, 0.05);
+
+            z-index: 2;
+
+            transform-style: preserve-3d;
+
+            transition:
+                transform 0.15s ease,
+                box-shadow 0.4s ease;
+
+            animation: cardEntry 1s ease forwards;
+        }
+
+        @keyframes cardEntry {
+            0% {
+                opacity: 0;
+                transform: translateY(80px) scale(0.8);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .calculator:hover {
+            box-shadow:
+                0 35px 100px rgba(0, 0, 0, 0.65),
+                0 0 40px rgba(0, 255, 255, 0.15),
+                inset 0 0 30px rgba(255, 255, 255, 0.08);
+        }
+
+
+        /* ==============================
+           TITLE
+        ============================== */
+
+        h1 {
+            text-align: center;
+
+            font-size: 32px;
+            font-weight: 800;
+
+            margin-bottom: 8px;
+
+            background: linear-gradient(
+                90deg,
+                #00f5ff,
+                #ffffff,
+                #ff00cc,
+                #00f5ff
+            );
+
+            background-size: 300%;
+
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+
+            animation: titleGradient 5s linear infinite;
+        }
+
+        @keyframes titleGradient {
+            0% {
+                background-position: 0%;
+            }
+
+            100% {
+                background-position: 300%;
+            }
+        }
+
+        .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.65);
+            font-size: 13px;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+
+
+        /* ==============================
+           FORM
+        ============================== */
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+
+            margin-bottom: 9px;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            color: rgba(255, 255, 255, 0.8);
+
+            letter-spacing: 0.5px;
+        }
+
+        input,
+        select {
+            width: 100%;
+
+            padding: 14px 16px;
+
+            border-radius: 14px;
+
+            border: 1px solid rgba(255, 255, 255, 0.15);
+
+            outline: none;
+
+            background: rgba(0, 0, 0, 0.25);
+
+            color: white;
+
+            font-size: 15px;
+
+            transition:
+                0.3s ease;
+
+            box-shadow:
+                inset 0 0 15px rgba(0, 0, 0, 0.15);
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #00f5ff;
+
+            background: rgba(0, 255, 255, 0.08);
+
+            box-shadow:
+                0 0 15px rgba(0, 245, 255, 0.35),
+                inset 0 0 10px rgba(0, 245, 255, 0.1);
+
+            transform: translateY(-2px);
+        }
+
+        select option {
+            background: #10152d;
+            color: white;
+        }
+
+
+        /* ==============================
+           BUTTONS
+        ============================== */
+
+        .buttons {
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 12px;
+
+            margin-top: 25px;
+        }
+
+        button {
+            position: relative;
+
+            padding: 15px;
+
+            border: none;
+
+            border-radius: 14px;
+
+            color: white;
+
+            font-size: 15px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            overflow: hidden;
+
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease;
+        }
+
+        .calculate-btn {
+            background:
+                linear-gradient(
+                    135deg,
+                    #00d4ff,
+                    #0066ff,
+                    #7b00ff
+                );
+
+            background-size: 200%;
+
+            box-shadow:
+                0 0 20px rgba(0, 153, 255, 0.35);
+
+            animation: buttonGradient 4s infinite alternate;
+        }
+
+        @keyframes buttonGradient {
+            0% {
+                background-position: 0%;
+            }
+
+            100% {
+                background-position: 100%;
+            }
+        }
+
+        .reset-btn {
+            background:
+                linear-gradient(
+                    135deg,
+                    #ff006e,
+                    #ff3c00,
+                    #ff9900
+                );
+
+            box-shadow:
+                0 0 20px rgba(255, 50, 0, 0.25);
+        }
+
+        button:hover {
+            transform:
+                translateY(-5px)
+                scale(1.03);
+
+            box-shadow:
+                0 12px 30px rgba(0, 0, 0, 0.4),
+                0 0 25px rgba(0, 255, 255, 0.3);
+        }
+
+        button:active {
+            transform:
+                translateY(1px)
+                scale(0.97);
+        }
+
+        button::before {
+            content: "";
+
+            position: absolute;
+
+            top: 0;
+            left: -100%;
+
+            width: 60%;
+            height: 100%;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.45),
+                    transparent
+                );
+
+            transform: skewX(-20deg);
+
+            transition: 0.6s;
+        }
+
+        button:hover::before {
+            left: 140%;
+        }
+
+
+        /* ==============================
+           RESULT
+        ============================== */
+
+        .result-box {
+            margin-top: 25px;
+
+            padding: 18px;
+
+            border-radius: 18px;
+
+            background:
+                rgba(0, 0, 0, 0.28);
+
+            border:
+                1px solid rgba(0, 255, 255, 0.2);
+
+            box-shadow:
+                inset 0 0 20px rgba(0, 255, 255, 0.05),
+                0 0 20px rgba(0, 255, 255, 0.08);
+        }
+
+        .result-label {
+            display: block;
+
+            font-size: 11px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 2px;
+
+            color: rgba(255, 255, 255, 0.5);
+
+            margin-bottom: 8px;
+        }
+
+        #result {
+            font-size: 27px;
+
+            font-weight: 800;
+
+            color: #00f5ff;
+
+            text-shadow:
+                0 0 10px rgba(0, 245, 255, 0.7),
+                0 0 25px rgba(0, 245, 255, 0.35);
+
+            border: none;
+
+            background: transparent;
+
+            padding: 0;
+
+            box-shadow: none;
+
+            cursor: default;
+        }
+
+
+        /* ==============================
+           THEME BUTTON
+        ============================== */
+
+        .theme-btn {
+            position: absolute;
+
+            top: 18px;
+            right: 18px;
+
+            width: 38px;
+            height: 38px;
+
+            padding: 0;
+
+            border-radius: 50%;
+
+            background: rgba(255, 255, 255, 0.1);
+
+            border: 1px solid rgba(255, 255, 255, 0.2);
+
+            font-size: 17px;
+        }
+
+
+        /* ==============================
+           FLOATING PARTICLES
+        ============================== */
+
+        .particle {
+            position: fixed;
+
+            width: 5px;
+            height: 5px;
+
+            border-radius: 50%;
+
+            background: #00f5ff;
+
+            box-shadow:
+                0 0 10px #00f5ff;
+
+            pointer-events: none;
+
+            opacity: 0.7;
+
+            animation:
+                floatParticle linear infinite;
+        }
+
+        @keyframes floatParticle {
+            from {
+                transform:
+                    translateY(110vh)
+                    translateX(0);
+            }
+
+            to {
+                transform:
+                    translateY(-10vh)
+                    translateX(100px);
+            }
+        }
+
+
+        /* ==============================
+           RESPONSIVE
+        ============================== */
+
+        @media (max-width: 500px) {
+
+            .calculator {
+                padding: 25px 20px;
+                border-radius: 22px;
+            }
+
+            h1 {
+                font-size: 27px;
+            }
+
+            .buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+    <!-- Animated Background -->
+    <div class="blob blob-one"></div>
+    <div class="blob blob-two"></div>
+    <div class="blob blob-three"></div>
+
+    <div class="mouse-glow" id="mouseGlow"></div>
+
+
+    <!-- Calculator -->
+    <div class="calculator" id="calculator">
+
+        <button
+            type="button"
+            class="theme-btn"
+            id="themeBtn"
+            title="Change Theme">
+            🎨
+        </button>
+
+
+        <h1>My Calculator</h1>
+
+        <p class="subtitle">
+            SMART • FAST • MODERN
+        </p>
+
+
+        <form method="post" id="calculatorForm">
+
+            {% csrf_token %}
+
+
+            <!-- First Number -->
+            <div class="input-group">
+
+                <label for="fot">
+                    First Number
+                </label>
+
+                <input
+                    type="number"
+                    name="a"
+                    id="fot"
+                    placeholder="Enter first number"
+                    step="any"
+                    required>
+
+            </div>
+
+
+            <!-- Second Number -->
+            <div class="input-group">
+
+                <label for="sot">
+                    Second Number
+                </label>
+
+                <input
+                    type="number"
+                    name="b"
+                    id="sot"
+                    placeholder="Enter second number"
+                    step="any"
+                    required>
+
+            </div>
+
+
+            <!-- Operator -->
+            <div class="input-group">
+
+                <label for="opr">
+                    Select Operator
+                </label>
+
+                <select name="opr" id="opr">
+
+                    <option value="+">
+                        Addition (+)
+                    </option>
+
+                    <option value="-">
+                        Subtraction (-)
+                    </option>
+
+                    <option value="*">
+                        Multiplication (×)
+                    </option>
+
+                    <option value="/">
+                        Division (÷)
+                    </option>
+
+                    <option value="**">
+                        Exponentiation (**)
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- Buttons -->
+            <div class="buttons">
+
+                <button
+                    type="submit"
+                    class="calculate-btn">
+                    ⚡ Calculate
+                </button>
+
+                <button
+                    type="button"
+                    class="reset-btn"
+                    id="resetBtn">
+                    ↻ Reset
+                </button>
+
+            </div>
+
+
+            <!-- Result -->
+            <div class="result-box">
+
+                <span class="result-label">
+                    Calculation Result
+                </span>
+
+                <input
+                    type="text"
+                    id="result"
+                    value="{{ solution }}"
+                    placeholder="Result"
+                    readonly>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <script>
+
+        /* ===================================
+           MOUSE FOLLOW GLOW
+        =================================== */
+
+        const mouseGlow =
+            document.getElementById("mouseGlow");
+
+        document.addEventListener("mousemove", function (event) {
+
+            mouseGlow.style.left =
+                event.clientX + "px";
+
+            mouseGlow.style.top =
+                event.clientY + "px";
+
+        });
+
+
+        /* ===================================
+           3D CARD TILT
+        =================================== */
+
+        const calculator =
+            document.getElementById("calculator");
+
+        document.addEventListener("mousemove", function (event) {
+
+            const rect =
+                calculator.getBoundingClientRect();
+
+            const x =
+                event.clientX - rect.left;
+
+            const y =
+                event.clientY - rect.top;
+
+            const centerX =
+                rect.width / 2;
+
+            const centerY =
+                rect.height / 2;
+
+            const rotateX =
+                ((y - centerY) / centerY) * -4;
+
+            const rotateY =
+                ((x - centerX) / centerX) * 4;
+
+            calculator.style.transform =
+                `perspective(1000px)
+                 rotateX(${rotateX}deg)
+                 rotateY(${rotateY}deg)`;
+
+        });
+
+
+        calculator.addEventListener("mouseleave", function () {
+
+            calculator.style.transform =
+                "perspective(1000px) rotateX(0deg) rotateY(0deg)";
+
+        });
+
+
+        /* ===================================
+           RESET BUTTON
+        =================================== */
+
+        const resetBtn =
+            document.getElementById("resetBtn");
+
+        resetBtn.addEventListener("click", function () {
+
+            document.getElementById("calculatorForm").reset();
+
+            document.getElementById("result").value = "";
+
+        });
+
+
+        /* ===================================
+           RESULT ANIMATION
+        =================================== */
+
+        const result =
+            document.getElementById("result");
+
+        if (result.value.trim() !== "") {
+
+            result.style.animation =
+                "resultPop 0.6s ease";
+
+        }
+
+
+        const resultStyle =
+            document.createElement("style");
+
+        resultStyle.innerHTML = `
+
+            @keyframes resultPop {
+
+                0% {
+                    opacity: 0;
+                    transform: scale(0.5);
+                }
+
+                70% {
+                    transform: scale(1.15);
+                }
+
+                100% {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+
+            }
+
+        `;
+
+        document.head.appendChild(resultStyle);
+
+
+        /* ===================================
+           DYNAMIC PARTICLES
+        =================================== */
+
+        for (let i = 0; i < 30; i++) {
+
+            const particle =
+                document.createElement("div");
+
+            particle.classList.add("particle");
+
+            particle.style.left =
+                Math.random() * 100 + "vw";
+
+            particle.style.animationDuration =
+                (5 + Math.random() * 10) + "s";
+
+            particle.style.animationDelay =
+                Math.random() * 8 + "s";
+
+            particle.style.opacity =
+                Math.random() * 0.7;
+
+            particle.style.transform =
+                `scale(${Math.random()})`;
+
+            document.body.appendChild(particle);
+
+        }
+
+
+        /* ===================================
+           DYNAMIC COLOR THEMES
+        =================================== */
+
+        const themeBtn =
+            document.getElementById("themeBtn");
+
+        const themes = [
+
+            {
+                primary: "#00f5ff",
+                secondary: "#7b00ff",
+                pink: "#ff00cc"
+            },
+
+            {
+                primary: "#00ff88",
+                secondary: "#00aaff",
+                pink: "#00ffcc"
+            },
+
+            {
+                primary: "#ffcc00",
+                secondary: "#ff6600",
+                pink: "#ff0066"
+            },
+
+            {
+                primary: "#ff4ecd",
+                secondary: "#7b2cff",
+                pink: "#00eaff"
+            }
+
+        ];
+
+        let currentTheme = 0;
+
+
+        themeBtn.addEventListener("click", function () {
+
+            currentTheme++;
+
+            if (currentTheme >= themes.length) {
+                currentTheme = 0;
+            }
+
+            const theme =
+                themes[currentTheme];
+
+            document.documentElement.style.setProperty(
+                "--primary",
+                theme.primary
+            );
+
+            document.documentElement.style.setProperty(
+                "--secondary",
+                theme.secondary
+            );
+
+            document.documentElement.style.setProperty(
+                "--pink",
+                theme.pink
+            );
+
+            document.body.style.background =
+                `
+                radial-gradient(
+                    circle at 10% 20%,
+                    ${theme.primary}55,
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 90% 80%,
+                    ${theme.pink}55,
+                    transparent 30%
+                ),
+                linear-gradient(
+                    135deg,
+                    #050816,
+                    ${theme.secondary}55,
+                    #111a3a,
+                    #160d2d
+                )
+                `;
+
+        });
+
+
+        /* ===================================
+           KEYBOARD SHORTCUT
+        =================================== */
+
+        document.addEventListener("keydown", function (event) {
+
+            if (event.key === "Escape") {
+
+                document.getElementById(
+                    "calculatorForm"
+                ).reset();
+
+                result.value = "";
+
+            }
+
+        });
+
+
+        /* ===================================
+           INPUT GLOW EFFECT
+        =================================== */
+
+        const inputs =
+            document.querySelectorAll(
+                "input, select"
+            );
+
+        inputs.forEach(function (input) {
+
+            input.addEventListener(
+                "mouseenter",
+                function () {
+
+                    input.style.transform =
+                        "translateY(-2px)";
+
+                }
+            );
+
+            input.addEventListener(
+                "mouseleave",
+                function () {
+
+                    if (document.activeElement !== input) {
+
+                        input.style.transform =
+                            "translateY(0)";
+
+                    }
+
+                }
+            );
+
+        });
+
+
+        /* ===================================
+           RIPPLE EFFECT
+        =================================== */
+
+        const buttons =
+            document.querySelectorAll("button");
+
+        buttons.forEach(function (button) {
+
+            button.addEventListener(
+                "click",
+                function (event) {
+
+                    const ripple =
+                        document.createElement("span");
+
+                    ripple.style.position =
+                        "absolute";
+
+                    ripple.style.width =
+                        "10px";
+
+                    ripple.style.height =
+                        "10px";
+
+                    ripple.style.borderRadius =
+                        "50%";
+
+                    ripple.style.background =
+                        "rgba(255,255,255,0.6)";
+
+                    ripple.style.left =
+                        event.offsetX + "px";
+
+                    ripple.style.top =
+                        event.offsetY + "px";
+
+                    ripple.style.transform =
+                        "translate(-50%, -50%) scale(1)";
+
+                    ripple.style.pointerEvents =
+                        "none";
+
+                    ripple.style.animation =
+                        "ripple 0.7s ease-out";
+
+                    button.appendChild(ripple);
+
+                    setTimeout(
+                        () => ripple.remove(),
+                        700
+                    );
+
+                }
+            );
+
+        });
+
+
+        const rippleStyle =
+            document.createElement("style");
+
+        rippleStyle.innerHTML = `
+
+            @keyframes ripple {
+
+                to {
+                    transform:
+                        translate(-50%, -50%)
+                        scale(20);
+
+                    opacity: 0;
+                }
+
+            }
+
+        `;
+
+        document.head.appendChild(rippleStyle);
+
+
+        /* ===================================
+           DYNAMIC TITLE
+        =================================== */
+
+        const titles = [
+            "My Calculator",
+            "Smart Calculator",
+            "Advanced Calculator",
+            "Glass Calculator"
+        ];
+
+        let titleIndex = 0;
+
+        setInterval(function () {
+
+            titleIndex++;
+
+            if (titleIndex >= titles.length) {
+                titleIndex = 0;
+            }
+
+            document.title =
+                titles[titleIndex];
+
+        }, 2500);
+
+    </script>
+
+</body>
+
+</html>
+

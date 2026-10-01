@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <h2>Update Student</h2>
+    <form method="POST">
+      {% csrf_token %} Name:
+      <input type="text" name="name" value="{{student.name}}" /> <br /><br />
+      Rollno: <input type="number" name="roll" value="{{student.rollno}}" />
+      <br /><br />
+        Class: <input type="number" name="class" value="{{student.student_class}}" />
+      <br /><br />
+       Age: <input type="number" name="age" value="{{student.age}}" />
+      <br /><br />
+      Parent No:
+      <input type="text" name="contact" value="{{student.parentno}}" />
+      <br /><br />
+      <button type="submit">Update</button>
+    </form>
+  </body>
+</html>

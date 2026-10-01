@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <style></style>
+
+  <body>
+    <h2>Add Student</h2>
+    <form method="POST">
+      {% csrf_token %} Name:
+      <input type="text" name="name" id="" /><br /><br />
+      Roll No:
+      <input type="number" name="roll" id="" /><br /><br />
+      Class:
+      <input type="number" name="class" id="" /><br /><br />
+      Age:
+      <input type="number" name="age" id="" /><br /><br />
+      Parent Contact:
+      <input type="text" name="contact" id="" /><br /><br />
+      <button type="submit">Save</button>
+    </form>
+    <p>{{message}}</p>
+    <a href="/modelsapp/list">View Students</a>
+  </body>
+</html>
